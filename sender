@@ -1,0 +1,27 @@
+import java.awt.*;
+import java.io.IOException; 
+import java.net.DatagramPacket; 
+import java.net.DatagramSocket; 
+
+public class sender{
+	public static void main(String[] args){
+		String host = args[0];
+		int udp_recive_port = Integer.parseInt(args[1]);
+		int udp_sender_port= Integer.parseInt(args[2]);
+		String name = args[3];
+		int max_size = Integer.parseInt(args[4]);
+		int timer = Integer.parseInt(args[5]); 
+
+		System.out.println(host);
+		System.out.println(udp_recive_port);
+		System.out.println(udp_sender_port);
+		System.out.println(name);
+		System.out.println(max_size);
+		System.out.println(timer);
+
+		DatagramSocket ds = new DatagramSocket(udp_recive_port);
+		
+
+
+	}
+}
