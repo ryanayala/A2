@@ -15,7 +15,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Insets;
 import java.awt.Dimension;
 
-
 import javax.swing.JTextField;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -29,9 +28,15 @@ import java.awt.Color;
 import java.net.*;
 import java.io.*;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+
+
+
 public class Gui_Rec{
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,7 +48,6 @@ public class Gui_Rec{
 	    
 		final JTextArea textArea = new JTextArea(10, 40);
 		f.add(textArea);
-		
 		
 		
 		JPanel textPanel = new JPanel();
@@ -71,8 +75,8 @@ public class Gui_Rec{
 
 		incom_ip.setText("Waiting For Ip");
 		incom_ip.setBackground(Color.RED);
-	    
-	    button.addActionListener(new ActionListener() {
+		//button_enabler
+		button.addActionListener(new ActionListener() {
 
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
@@ -80,8 +84,28 @@ public class Gui_Rec{
 
 	        }
 	    });
+		
+		f.setVisible(true);
+		//Listener
+		//try {
+			DatagramSocket ds = new DatagramSocket(4455); // for testing port 80
+			byte[] buf = new byte[400];
+			
+			DatagramPacket dp = new DatagramPacket(buf,buf.length);
+			ds.receive(dp);
+			
+			String strRecv = new String(dp.getData(), 0, dp.getLength());
+			System.out.println(strRecv);
+			
+			ds.close();
+			
+		//} catch(Exception e) {
+			//System.out.printf("Error Caught");
+		//}
 
-	    f.setVisible(true);
+	    
+
+	    
 		
 	}
 	
