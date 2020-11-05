@@ -30,31 +30,36 @@ public class sender{
 		System.out.println(timer);
 		DatagramPacket dp;
 
+		int ack = 0;
 		
 
 		
 
-		DatagramSocket ds = new DatagramSocket();
+		DatagramSocket ds = new DatagramSocket(udp_sender_port);
 
 
 
 		InetAddress ip = InetAddress.getByName(host);
 
 
-		String str = "";
+		String str = "" + ack ;
+
 		byte[] receive = new byte[max_size];
 
 		File file = new File(name);
 
 		Scanner sc = new Scanner(file);
 
+		while(true){
+
 		while(sc.hasNextLine()){
 
 			str = str + sc.nextLine();
 			System.out.println(str);
 
-			if(str.length()== receive.length){
+			if(str.length()== receive.length-1){
 				break;
+
 			}
 
 		}
@@ -64,12 +69,48 @@ public class sender{
 
 		}
 
-		else{
+		else {
 
 			 dp = new DatagramPacket(str.getBytes(),receive.length, ip, udp_recive_port);
 
 			}	
 		ds.send(dp);
+
+		ds.setSoTimeout(timer);
+
+		while(true) {
+
+
+			try{
+    			ds.receive(dp);
+
+    			String strRecv = new String(dp.getData(), 0, dp.getLength());
+
+
+    			//if(strRecv.equals("ACK0")){
+
+    			//}
+    			str = "";
+
+
+
+			}catch (SocketTimeoutException e) {
+        		break;  // Closing here would cause a SocketException
+    		}
+
+    		ds.send(dp);
+    		ds.setSoTimeout(timer);
+
+
+
+
+
+		}
+
+
+	}
+
+
 
 
 
