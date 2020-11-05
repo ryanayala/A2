@@ -28,6 +28,7 @@ public class sender{
 		System.out.println(name);
 		System.out.println(max_size);
 		System.out.println(timer);
+		DatagramPacket dp;
 
 		
 
@@ -36,33 +37,38 @@ public class sender{
 		DatagramSocket ds = new DatagramSocket();
 
 
-		byte[] in = Files.readAllBytes(Paths.get(name));
 
 		InetAddress ip = InetAddress.getByName(host);
 
 
-
+		String str = "";
 		byte[] receive = new byte[max_size];
 
+		File file = new File(name);
 
+		Scanner sc = new Scanner(file);
 
-		int i = 0;
-		while(i<receive.length){
-			String content= Byte.toString(receive[i]);
-			if( content == "*"){
+		while(sc.hasNextLine()){
+
+			str = str + sc.nextLine();
+			System.out.println(str);
+
+			if(str.length()== receive.length){
 				break;
 			}
-			receive[i]= in[i];
-			i++;
-			
-		}	
-			
 
-		DatagramPacket dp = new DatagramPacket(receive,receive.length, ip, udp_recive_port);
-
-
+		}
 		
+		if(str.length()<receive.length){
+			dp = new DatagramPacket(str.getBytes(),str.length(), ip, udp_recive_port);
 
+		}
+
+		else{
+
+			 dp = new DatagramPacket(str.getBytes(),receive.length, ip, udp_recive_port);
+
+			}	
 		ds.send(dp);
 
 
