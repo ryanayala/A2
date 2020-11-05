@@ -50,10 +50,11 @@ public class sender{
 
 		Scanner sc = new Scanner(file);
 
-		while(true){
 
 		while(sc.hasNextLine()){
 
+
+		while(sc.hasNextLine()){
 			str = str + sc.nextLine();
 			System.out.println(str);
 
@@ -61,8 +62,9 @@ public class sender{
 				break;
 
 			}
-
 		}
+
+		
 		
 		if(str.length()<receive.length){
 			dp = new DatagramPacket(str.getBytes(),str.length(), ip, udp_recive_port);
@@ -87,13 +89,21 @@ public class sender{
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
 
 
-    			//if(strRecv.equals("ACK0")){
+    			if(strRecv.contains(str[0])){
 
-    			//}
-    			str = "";
+    				if(ack ==1){
+    					ack =0;
+    				}
+    				else{
+    					ack =1;
+    				}
+    				str = "" + ack ;
 
+    				break;
 
+    			}
 
+ 
 			}catch (SocketTimeoutException e) {
         		break;  // Closing here would cause a SocketException
     		}
@@ -107,10 +117,48 @@ public class sender{
 
 		}
 
+	}
+
+	str= ack +"EOF";
+
+	 dp = new DatagramPacket(str.getBytes(),str.length(), ip, udp_recive_port);
+
+	 while(true) {
+
+
+			try{
+    			ds.receive(dp);
+
+    			String strRecv = new String(dp.getData(), 0, dp.getLength());
+
+
+    			if(strRecv.contains(str[0])){
+
+    				if(ack ==1){
+    					ack =0;
+    				}
+    				else{
+    					ack =1;
+    				}
+    				str = "" + ack ;
+
+    				break;
+
+    			}
+
+ 
+			}catch (SocketTimeoutException e) {
+        		break;  // Closing here would cause a SocketException
+    		}
+
+    		ds.send(dp);
+    		ds.setSoTimeout(timer);
+
+
 
 	}
 
-
+	ds.close();
 
 
 
