@@ -40,6 +40,10 @@ import java.io.PrintWriter;
 
 public class Gui_Rec{
 	public DatagramSocket ds = null;
+	public int portsend = -1;
+	public String ipsend = null;
+	public int acknum = 0;
+	public int waitingFor = 0;
 	public Gui_Rec() {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
@@ -78,13 +82,14 @@ public class Gui_Rec{
 
 		incom_ip.setText("Waiting For Ip");
 		incom_ip.setBackground(Color.RED);
-		//button_enabler
 
 		button.addActionListener(new ActionListener() {
 			
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
 	        	try {
+	        		portsend = Integer.parseInt(UDPportsend.getText());
+	        		ipsend = ipField.getText();
 	        		ds = new DatagramSocket(Integer.parseInt(UDPportreceive.getText())); // for testing port 4455
 	        		File file = new File(fileField.getText());   
 	        		//editing file
@@ -137,15 +142,18 @@ public class Gui_Rec{
 			System.out.println(strRecv);
 			if (!strRecv.equals("EOF")) {
 				printW.print(strRecv);
+				
 			}
-			//adding to file
-			
+			ack();
 		}
 			
 	}
 	
-	public void ack() {
-		; // this is just a pass
+	public void ack() throws IOException{
+		InetAddress ip = InetAddress.getByName(ipsend);
+		byte[] b = (new String("ACK"+Integer.toString(acknum)).getBytes());
+		DatagramPacket d = new DatagramPacket(b,4, ip, portsend);
+		ds.send(d);
 	}
 }
 
