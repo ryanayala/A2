@@ -5,6 +5,13 @@ import java.net.DatagramSocket;
 import java.io.File; 
 import java.util.Scanner; 
 import java.net.*;
+import java.nio.*;
+import java.nio.file.*;
+import java.io.*;
+import java.util.stream.*;
+import java.nio.charset.StandardCharsets;
+
+
 
 public class sender{
 	public static void main(String[] args) throws Exception{
@@ -24,31 +31,39 @@ public class sender{
 
 		
 
+		
+
 		DatagramSocket ds = new DatagramSocket();
 
 
-		//byte[] in =Files.readAllbytes(name);
-		String me = "Hello Universe ";
+		byte[] in = Files.readAllBytes(Paths.get(name));
 
 		InetAddress ip = InetAddress.getByName(host);
 
-		//byte[] in = me.getBytes();
 
-		//byte[] receive = new byte[max_size];
 
-		//for(int i =0; i<receive.length; i++){
-			//receive[i]= in[i];
-		//} 
+		byte[] receive = new byte[max_size];
 
-		DatagramPacket dp = new DatagramPacket(me.getBytes(),me.length(), ip, udp_recive_port);
+
+
+		int i = 0;
+		while(i<receive.length){
+			String content= Byte.toString(receive[i]);
+			if( content == "*"){
+				break;
+			}
+			receive[i]= in[i];
+			i++;
+			
+		}	
+			
+
+		DatagramPacket dp = new DatagramPacket(receive,receive.length, ip, udp_recive_port);
+
+
+		
 
 		ds.send(dp);
-
-
-
-
-
-
 
 
 
