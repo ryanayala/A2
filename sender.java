@@ -89,7 +89,10 @@ public class sender{
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
 
 
-    			if(strRecv.contains(str[0])){
+    			char a =str.charAt(0);
+    			char b = strRecv.charAt(0);
+
+    			if(Character.compare(a,b) == 0){
 
     				if(ack ==1){
     					ack =0;
@@ -131,8 +134,10 @@ public class sender{
 
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
 
+    			char a =str.charAt(0);
+    			char b = strRecv.charAt(0);
 
-    			if(strRecv.contains(str[0])){
+    			if(Character.compare(a,b) == 0){
 
     				if(ack ==1){
     					ack =0;
