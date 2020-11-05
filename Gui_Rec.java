@@ -42,8 +42,7 @@ public class Gui_Rec{
 	public DatagramSocket ds = null;
 	public int portsend = -1;
 	public String ipsend = null;
-	public int acknum = 0;
-	public int waitingFor = 0;
+	public String acknum = "0";
 	public Gui_Rec() {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
@@ -122,6 +121,7 @@ public class Gui_Rec{
             PrintWriter pw = new PrintWriter(bw);
             //adding data to the file.
             readSocketAppendToFile(pw, datasocket);
+            acknum = "0";
             //closing file
             pw.close();
             bw.close();
@@ -139,21 +139,33 @@ public class Gui_Rec{
 			DatagramPacket dp = new DatagramPacket(buf,buf.length);
 			datasocket.receive(dp);
 			strRecv = new String(dp.getData(), 0, dp.getLength());
-			System.out.println(strRecv);
-			if (!strRecv.equals("EOF")) {
-				printW.print(strRecv);
-				
+			//System.out.print(strRecv.substring(0,1));
+			if(strRecv.substring(0,1).equals(acknum)) {
+				//System.out.print("got into ack if");
+				System.out.println(strRecv);//can be removed later
+				strRecv=strRecv.substring(1);
+				if (!strRecv.equals("EOF")) {
+					printW.print(strRecv);
+					
+				}
+				ack();
 			}
-			ack();
+			
+			
 		}
 			
 	}
 	
 	public void ack() throws IOException{
 		InetAddress ip = InetAddress.getByName(ipsend);
-		byte[] b = (new String("ACK"+Integer.toString(acknum)).getBytes());
+		byte[] b = (new String(acknum+"ACK").getBytes());
 		DatagramPacket d = new DatagramPacket(b,4, ip, portsend);
 		ds.send(d);
+		if(acknum.equals("1")) {
+			acknum = "0";
+		} else {
+			acknum = "1";
+		}
 	}
 }
 
