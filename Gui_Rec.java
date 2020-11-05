@@ -31,12 +31,16 @@ import java.io.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Scanner; 
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
 
 
 
 public class Gui_Rec{
-	
-	public static void main(String[] args) throws IOException {
+	public DatagramSocket ds = null;
+	public Gui_Rec() {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,7 +48,6 @@ public class Gui_Rec{
 	    f.setLocation(300,200);
 	    //layout
 	    f.setLayout(new GridLayout(0,2));
-	    
 	    
 		final JTextArea textArea = new JTextArea(10, 40);
 		f.add(textArea);
@@ -76,39 +79,73 @@ public class Gui_Rec{
 		incom_ip.setText("Waiting For Ip");
 		incom_ip.setBackground(Color.RED);
 		//button_enabler
-		button.addActionListener(new ActionListener() {
 
+		button.addActionListener(new ActionListener() {
+			
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            textArea.append("Sent Ack\n");
+	        	try {
+	        		ds = new DatagramSocket(Integer.parseInt(UDPportreceive.getText())); // for testing port 4455
+	        		File file = new File(fileField.getText());   
+	        		//editing file
+	        		System.out.println("listening");
+	        		receiveFile(fileField.getText(), ds);
+	        		if (!ds.equals(null)) {
+	        			ds.close();
+	        			ds = null;
+	        		}
+	        	}catch(Exception fileE) {
+	        		System.out.println("Failed To Edit and Write Socket...");
+	        	}
+	        	
 
 	        }
 	    });
-		
 		f.setVisible(true);
-		//Listener
-		//try {
-			DatagramSocket ds = new DatagramSocket(4455); // for testing port 80
-			byte[] buf = new byte[400];
-			
-			DatagramPacket dp = new DatagramPacket(buf,buf.length);
-			ds.receive(dp);
-			
-			String strRecv = new String(dp.getData(), 0, dp.getLength());
-			System.out.println(strRecv);
-			
-			ds.close();
-			
-		//} catch(Exception e) {
-			//System.out.printf("Error Caught");
-		//}
-
-	    
-
-	    
-		
 	}
 	
-
-
+	
+	public static void main(String[] args) throws IOException {
+		Gui_Rec gr = new Gui_Rec();
+	}
+	
+	
+	public void receiveFile(String fileName, DatagramSocket datasocket) {
+		try {
+			FileWriter fw = new FileWriter(fileName, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter pw = new PrintWriter(bw);
+            //adding data to the file.
+            readSocketAppendToFile(pw, datasocket);
+            //closing file
+            pw.close();
+            bw.close();
+            fw.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void readSocketAppendToFile(PrintWriter printW, DatagramSocket datasocket) throws IOException {
+		byte[] buf = new byte[400];
+		String strRecv = "";
+		
+		while(!strRecv.equals("EOF")) {
+			DatagramPacket dp = new DatagramPacket(buf,buf.length);
+			datasocket.receive(dp);
+			strRecv = new String(dp.getData(), 0, dp.getLength());
+			System.out.println(strRecv);
+			if (!strRecv.equals("EOF")) {
+				printW.print(strRecv);
+			}
+			//adding to file
+			
+		}
+			
+	}
+	
+	public void ack() {
+		; // this is just a pass
+	}
 }
+
