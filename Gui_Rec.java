@@ -43,6 +43,10 @@ public class Gui_Rec{
 	public int portsend = -1;
 	public String ipsend = null;
 	public String acknum = "0";
+	public JLabel packetSeq = new JLabel("packet sequence: 0");
+	public int seqCount = 0;
+	public int dataRecieved = 0;
+	public int reliableTrans = 1;
 	public Gui_Rec() {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
@@ -53,7 +57,9 @@ public class Gui_Rec{
 	    f.setLayout(new GridLayout(0,2));
 	    
 		final JTextArea textArea = new JTextArea(10, 40);
+		
 		f.add(textArea);
+		
 		
 		
 		JPanel textPanel = new JPanel();
@@ -63,8 +69,10 @@ public class Gui_Rec{
 		 JTextField UDPportsend = new JTextField(13);
 		 JTextField UDPportreceive = new JTextField(13);
 		 JTextField fileField = new JTextField(13);
-		 final JButton button = new JButton("Return Ack");
-		
+		 final JButton button = new JButton("Receive");
+		 final JButton buttonToggle = new JButton(" “currently: reliable");
+		 ///unreliable
+		textPanel.add(packetSeq);
 		textPanel.add(new JLabel("IP FIIELD"));
 		textPanel.add(ipField);
 		textPanel.add(new JLabel("UDP SEND FIIELD"));
@@ -74,6 +82,7 @@ public class Gui_Rec{
 		textPanel.add(new JLabel("FILE NAME REQUEST FIIELD"));
 		textPanel.add(fileField);
 		textPanel.add(button);
+		textPanel.add(buttonToggle);
 		
 		f.add(textPanel);
 
@@ -89,6 +98,7 @@ public class Gui_Rec{
 	        	try {
 	        		portsend = Integer.parseInt(UDPportsend.getText());
 	        		ipsend = ipField.getText();
+	        		packetSeq.setText("packet sequence: 0");
 	        		ds = new DatagramSocket(Integer.parseInt(UDPportreceive.getText())); // for testing port 4455
 	        		File file = new File(fileField.getText());   
 	        		//editing file
@@ -100,6 +110,20 @@ public class Gui_Rec{
 	        		}
 	        	}catch(Exception fileE) {
 	        		System.out.println("Failed To Edit and Write Socket...");
+	        	}
+	        	
+
+	        }
+	    });buttonToggle.addActionListener(new ActionListener() {
+			
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	if (buttonToggle.getText().equals("currently: reliable")) {
+	        		reliableTrans = 0;
+	        		buttonToggle.setText("currently: unreliable");
+	        	} else {
+	        		reliableTrans = 1;
+	        		buttonToggle.setText("currently: reliable");
 	        	}
 	        	
 
@@ -122,6 +146,7 @@ public class Gui_Rec{
             //adding data to the file.
             readSocketAppendToFile(pw, datasocket);
             acknum = "0";
+            dataRecieved = 0;
             //closing file
             pw.close();
             bw.close();
@@ -136,12 +161,15 @@ public class Gui_Rec{
 		String strRecv = "";
 		
 		while(!strRecv.equals("EOF")) {
+		//if(!strRecv.equals("EOF")) {
+			//dataRecieved+=1;
 			DatagramPacket dp = new DatagramPacket(buf,buf.length);
 			datasocket.receive(dp);
 			strRecv = new String(dp.getData(), 0, dp.getLength());
-			//System.out.print(strRecv.substring(0,1));
+			//if (dataRecieved%10 = 0) {
 			if(strRecv.substring(0,1).equals(acknum)) {
-				//System.out.print("got into ack if");
+				seqCount+=1;
+				packetSeq.setText("packet sequence: "+ Integer.toString(seqCount));
 				System.out.println(strRecv);//can be removed later
 				strRecv=strRecv.substring(1);
 				if (!strRecv.equals("EOF")) {
