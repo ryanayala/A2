@@ -200,7 +200,7 @@ public class Gui_Rec{
 		JTextField _fileField;
 		JTextField _ipField;
 		
-		public SocketReader(JTextField UDPportsend,JTextField UDPportreceive,JTextField fileField, JTextField ipField) {
+		public SocketReader(JTextField UDPportreceive,JTextField UDPportsend,JTextField fileField, JTextField ipField) {
 	
 			_UDPportsend = UDPportsend;
 			_UDPportreceive = UDPportreceive;
