@@ -188,10 +188,6 @@ public class sender2{
 
   }
 
-
-
-
-
   		String end = String.valueOf(ack) + "EOF";
 
 
@@ -210,9 +206,6 @@ public class sender2{
     			ds.receive(dp);
 
     			System.out.println("Received");
-
-
-
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
 
     			System.out.println(strRecv);
@@ -238,32 +231,19 @@ public class sender2{
     				
     				message= null;
     				receive= null;
-    				ack_array=null;
-    				
-
-
+    				ack_array=null;	
     				break;
 
     			}
 
-
     		}catch (SocketTimeoutException e) {
         		break;  // Closing here would cause a SocketException
     		}
-
     		ds.send(dp);
     		ds.setSoTimeout(timer);
-
 			}
-
-	file.close();
 	ds.close();
-
-
 	}
-
-
-
 	public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
 
         return ByteBuffer.allocate(byte1.length + byte2.length)
