@@ -96,9 +96,9 @@ public class Gui_Rec{
 			
 	        @Override
 	        public void actionPerformed(ActionEvent e)  {
-	        	button.disable();
+	        	
 	        	(new Thread(new SocketReader( UDPportsend, UDPportreceive, fileField,  ipField))).start();
-	        	button.enable();
+	     
 	        }
 	    });
 		
