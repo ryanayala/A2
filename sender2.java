@@ -48,12 +48,15 @@ public class sender2{
 		int endof = 0;
 		
 
-		DatagramSocket ds = new DatagramSocket(Integer.parseInt(args[1]));
+		DatagramSocket ds = new DatagramSocket(Integer.parseInt(args[2]));
 
 
 
 
 		InetAddress ip = InetAddress.getByName(host);
+
+		System.out.println(System.currentTimeMillis());
+
 
 
 
@@ -90,7 +93,7 @@ public class sender2{
 					
 			}
 
-			dp = new DatagramPacket(message,message.length, ip, Integer.parseInt(args[2]));
+			dp = new DatagramPacket(message,message.length, ip, Integer.parseInt(args[1]));
 
 			ds.send(dp);
 
@@ -102,10 +105,11 @@ public class sender2{
 			while(true){
 				try{
 
-				offset+=dp.getLength();
-				System.out.println(offset);
-
+				
+				
     			ds.receive(dp);
+
+    			offset+=dp.getLength();
 
     			
 
@@ -169,7 +173,7 @@ public class sender2{
   		String end = String.valueOf(ack) + "EOF";
 
 
-      	dp = new DatagramPacket(end.getBytes(),end.length(), ip,  Integer.parseInt(args[2]));
+      	dp = new DatagramPacket(end.getBytes(),end.length(), ip,  Integer.parseInt(args[1]));
 
 		ds.send(dp);
 		ds.setSoTimeout(timer);
@@ -178,10 +182,11 @@ public class sender2{
 		while(true){
 				try{
 
-				offset+=dp.getLength();
-				System.out.println(offset);
+				
 
     			ds.receive(dp);
+
+    			offset+=dp.getLength();
 
     			System.out.println("Received");
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
@@ -219,7 +224,10 @@ public class sender2{
     		ds.send(dp);
     		ds.setSoTimeout(timer);
 			}
+
+
 	ds.close();
+	System.out.println(System.currentTimeMillis());
 	}
 	public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
 
