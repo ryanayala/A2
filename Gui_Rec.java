@@ -97,7 +97,7 @@ public class Gui_Rec{
 	        @Override
 	        public void actionPerformed(ActionEvent e)  {
 	        	
-	        	(new Thread(new SocketReader( UDPportsend, UDPportreceive, fileField,  ipField))).start();
+	        	(new Thread(new SocketReader( UDPportreceive, UDPportsend, fileField,  ipField))).start();
 	     
 	        }
 	    });
