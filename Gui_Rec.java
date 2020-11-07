@@ -47,6 +47,7 @@ public class Gui_Rec{
 	public int seqCount = 0;
 	public int dataRecieved = 0;
 	public int reliableTrans = 1;
+	
 	public Gui_Rec() {
 		//Window placement and size
 		JFrame f = new JFrame("Receiver");
@@ -70,7 +71,7 @@ public class Gui_Rec{
 		 JTextField UDPportreceive = new JTextField(13);
 		 JTextField fileField = new JTextField(13);
 		 final JButton button = new JButton("Receive");
-		 final JButton buttonToggle = new JButton(" “currently: reliable");
+		 final JButton buttonToggle = new JButton("currently: reliable");
 		 ///unreliable
 		textPanel.add(packetSeq);
 		textPanel.add(new JLabel("IP FIIELD"));
@@ -94,27 +95,14 @@ public class Gui_Rec{
 		button.addActionListener(new ActionListener() {
 			
 	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	        	try {
-	        		portsend = Integer.parseInt(UDPportsend.getText());
-	        		ipsend = ipField.getText();
-	        		packetSeq.setText("packet sequence: 0");
-	        		ds = new DatagramSocket(Integer.parseInt(UDPportreceive.getText())); // for testing port 4455
-	        		File file = new File(fileField.getText());   
-	        		//editing file
-	        		System.out.println("listening");
-	        		receiveFile(fileField.getText(), ds);
-	        		if (!ds.equals(null)) {
-	        			ds.close();
-	        			ds = null;
-	        		}
-	        	}catch(Exception fileE) {
-	        		System.out.println("Failed To Edit and Write Socket...");
-	        	}
-	        	
-
+	        public void actionPerformed(ActionEvent e)  {
+	        	button.disable();
+	        	(new Thread(new SocketReader( UDPportsend, UDPportreceive, fileField,  ipField))).start();
+	        	button.enable();
 	        }
-	    });buttonToggle.addActionListener(new ActionListener() {
+	    });
+		
+		buttonToggle.addActionListener(new ActionListener() {
 			
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
@@ -139,7 +127,9 @@ public class Gui_Rec{
 	
 	
 	public void receiveFile(String fileName, DatagramSocket datasocket) {
+		
 		try {
+			
 			FileWriter fw = new FileWriter(fileName, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter pw = new PrintWriter(bw);
@@ -147,11 +137,13 @@ public class Gui_Rec{
             readSocketAppendToFile(pw, datasocket);
             acknum = "0";
             dataRecieved = 0;
+            seqCount = 0;
             //closing file
             pw.close();
             bw.close();
             fw.close();
 		} catch(Exception e) {
+			
 			e.printStackTrace();
 		}
 	}
@@ -159,28 +151,32 @@ public class Gui_Rec{
 	public void readSocketAppendToFile(PrintWriter printW, DatagramSocket datasocket) throws IOException {
 		byte[] buf = new byte[400];
 		String strRecv = "";
-		
 		while(!strRecv.equals("EOF")) {
-		//if(!strRecv.equals("EOF")) {
-			//dataRecieved+=1;
+			System.out.print(dataRecieved);
+			dataRecieved+=1;
 			DatagramPacket dp = new DatagramPacket(buf,buf.length);
 			datasocket.receive(dp);
-			strRecv = new String(dp.getData(), 0, dp.getLength());
-			//if (dataRecieved%10 = 0) {
-			if(strRecv.substring(0,1).equals(acknum)) {
-				seqCount+=1;
-				packetSeq.setText("packet sequence: "+ Integer.toString(seqCount));
-				System.out.println(strRecv);//can be removed later
-				strRecv=strRecv.substring(1);
-				if (!strRecv.equals("EOF")) {
-					printW.print(strRecv);
+			if (reliableTrans == 1 || dataRecieved%10 != 0) {
+				
+				strRecv = new String(dp.getData(), 0, dp.getLength());
+				if(strRecv.substring(0,1).equals(acknum)) {
 					
+					seqCount+=1;
+					packetSeq.setText("packet sequence: "+ Integer.toString(seqCount));
+					System.out.println(strRecv);//can be removed later
+					strRecv=strRecv.substring(1);
+					if (!strRecv.equals("EOF")) {
+						
+						printW.print(strRecv);
+						
+					}
+					ack();
 				}
-				ack();
 			}
 			
 			
 		}
+		
 			
 	}
 	
@@ -195,5 +191,43 @@ public class Gui_Rec{
 			acknum = "1";
 		}
 	}
+	
+	
+	public class SocketReader implements Runnable{
+		Gui_Rec _parent;
+		JTextField _UDPportsend;
+		JTextField _UDPportreceive;
+		JTextField _fileField;
+		JTextField _ipField;
+		
+		public SocketReader(JTextField UDPportsend,JTextField UDPportreceive,JTextField fileField, JTextField ipField) {
+	
+			_UDPportsend = UDPportsend;
+			_UDPportreceive = UDPportreceive;
+			_fileField = fileField;
+			_ipField = ipField;
+		}
+		public void run() {
+			try {
+        		portsend = Integer.parseInt(_UDPportsend.getText());
+        		ipsend = _ipField.getText();
+        		packetSeq.setText("packet sequence: 0");
+        		ds = new DatagramSocket(Integer.parseInt(_UDPportreceive.getText())); // for testing port 4455
+        		File file = new File(_fileField.getText());   
+        		//editing file
+        		System.out.println("listening");
+        		receiveFile(_fileField.getText(), ds);
+        		if (!ds.equals(null)) {
+        			ds.close();
+        			ds = null;
+        		}
+        	}catch(Exception fileE) {
+        		System.out.println("Failed To Edit and Write Socket...");
+        	}   
+			
+		}
+	}
+	
 }
+
 
