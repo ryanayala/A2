@@ -148,7 +148,7 @@ public class sender2{
 
 
     		}catch (SocketTimeoutException e) {
-        		break;  // Closing here would cause a SocketException
+        		  // Closing here would cause a SocketException
     		}
 
     		ds.send(dp);
@@ -219,7 +219,7 @@ public class sender2{
     			}
 
     		}catch (SocketTimeoutException e) {
-        		break;  // Closing here would cause a SocketException
+        		  // Closing here would cause a SocketException
     		}
     		ds.send(dp);
     		ds.setSoTimeout(timer);
