@@ -104,12 +104,12 @@ public class sender2{
 
 			while(true){
 				try{
-
+				offset+=dp.getLength();
 				
 				
     			ds.receive(dp);
 
-    			offset+=dp.getLength();
+    			
 
     			
 
@@ -182,11 +182,11 @@ public class sender2{
 		while(true){
 				try{
 
-				
+				offset+=dp.getLength();
 
     			ds.receive(dp);
 
-    			offset+=dp.getLength();
+    			
 
     			System.out.println("Received");
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
