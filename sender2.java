@@ -33,6 +33,7 @@ public class sender2{
 		System.out.println(name);
 		System.out.println(max_size);
 		System.out.println(timer);
+
 		DatagramPacket dp;
 
 		int ack = 0;
@@ -41,10 +42,13 @@ public class sender2{
 
 		InputStream is = null;
 		int offset =0;
-
+		byte[] receive;
+		byte[] ack_array;
+		byte[] message ;
+		int endof = 0;
 		
 
-		DatagramSocket ds = new DatagramSocket(udp_sender_port);
+		DatagramSocket ds = new DatagramSocket(Integer.parseInt(args[1]));
 
 
 
@@ -52,31 +56,39 @@ public class sender2{
 		InetAddress ip = InetAddress.getByName(host);
 
 
+
 		File file = new File(name);
-
-
 		while(true){
-		byte[] receive = new byte[max_size-1];
 
-		byte[] ack_array = new byte[1];
+		//while(true){
 
-		byte[] message = new byte[max_size];
+		 receive = new byte[max_size-1];
+
+		 ack_array = new byte[1];
+
+		message = new byte[max_size];
+
+		
 
 		ack_str = String.valueOf(ack);
 
 		ack_array=ack_str.getBytes();
 
 
+
 		try{
 			is = new FileInputStream(file);
+			is.skip(offset);
+			is.read(receive,0,max_size-1);
 
-			is.read(receive,offset,max_size-1);
 
 			message=joinByteArray(ack_array,receive);
 
 
-			if(is.read(receive,offset,max_size-1)==-1){
-				break;
+			if(is.read(receive,0,max_size-1)==-1){
+
+				endof =1;
+					
 			}
 
 			//for(byte b:message) {
@@ -89,7 +101,11 @@ public class sender2{
          //}
 
 
-			dp = new DatagramPacket(message,message.length, ip, udp_recive_port);
+			dp = new DatagramPacket(message,message.length, ip, Integer.parseInt(args[2]));
+
+			//int idport =dp.getPort();
+
+			//System.out.println(idport);
 
 
 			ds.send(dp);
@@ -107,6 +123,8 @@ public class sender2{
 				try{
 
 				offset+=dp.getLength();
+				System.out.println(offset);
+
     			ds.receive(dp);
 
     			System.out.println("Received");
@@ -115,21 +133,32 @@ public class sender2{
 
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
 
+    			System.out.println(strRecv);
 
 
-    			char a = (char) ack;
+    			char a = Character.forDigit(ack, 10);;
     			char b = strRecv.charAt(0);
+    			//System.out.println(a);
+    			//System.out.println(b);
 
     			if(a==b){
-    				System.out.println("it worked");
+    				
 
     				if(ack ==1){
     					ack = 0;
+    					//System.out.println(ack);
     				}
-    				else{
+    				else if (ack==0) {
+    				
     					ack =1;
+    					System.out.println(ack);
     				}
     				
+    				message= null;
+    				receive= null;
+    				ack_array=null;
+    				
+
 
     				break;
 
@@ -145,6 +174,10 @@ public class sender2{
 
 			}
 
+			if(endof==1){
+				break;
+			}
+
 
 
 
@@ -155,11 +188,76 @@ public class sender2{
 
   }
 
-  String end = String.valueOf(ack) +"EOF";
 
-      ds.close();
-      dp = new DatagramPacket(end.getBytes(),end.length(), ip, udp_recive_port);
-			ds.send(dp);
+
+
+
+  		String end = String.valueOf(ack) + "EOF";
+
+
+      	dp = new DatagramPacket(end.getBytes(),end.length(), ip,  Integer.parseInt(args[2]));
+
+		ds.send(dp);
+		ds.setSoTimeout(timer);
+
+
+		while(true){
+				try{
+
+				offset+=dp.getLength();
+				System.out.println(offset);
+
+    			ds.receive(dp);
+
+    			System.out.println("Received");
+
+
+
+    			String strRecv = new String(dp.getData(), 0, dp.getLength());
+
+    			System.out.println(strRecv);
+
+
+    			char a = Character.forDigit(ack, 10);;
+    			char b = strRecv.charAt(0);
+    			//System.out.println(a);
+    			//System.out.println(b);
+
+    			if(a==b){
+    				
+
+    				if(ack ==1){
+    					ack = 0;
+    					//System.out.println(ack);
+    				}
+    				else if (ack==0) {
+    				
+    					ack =1;
+    					System.out.println(ack);
+    				}
+    				
+    				message= null;
+    				receive= null;
+    				ack_array=null;
+    				
+
+
+    				break;
+
+    			}
+
+
+    		}catch (SocketTimeoutException e) {
+        		break;  // Closing here would cause a SocketException
+    		}
+
+    		ds.send(dp);
+    		ds.setSoTimeout(timer);
+
+			}
+
+	file.close();
+	ds.close();
 
 
 	}
