@@ -60,7 +60,6 @@ public class sender2{
 		File file = new File(name);
 		while(true){
 
-		//while(true){
 
 		 receive = new byte[max_size-1];
 
@@ -91,30 +90,11 @@ public class sender2{
 					
 			}
 
-			//for(byte b:message) {
-         
-            // convert byte to character
-            //char c = (char)b;
-            
-            // prints character
-            //System.out.print(c);
-         //}
-
-
 			dp = new DatagramPacket(message,message.length, ip, Integer.parseInt(args[2]));
-
-			//int idport =dp.getPort();
-
-			//System.out.println(idport);
-
 
 			ds.send(dp);
 
-			System.out.println("sent");
-
-
-
-
+			
 			ds.setSoTimeout(timer);
 
 
@@ -127,8 +107,7 @@ public class sender2{
 
     			ds.receive(dp);
 
-    			System.out.println("Received");
-
+    			
 
 
     			String strRecv = new String(dp.getData(), 0, dp.getLength());
@@ -138,20 +117,19 @@ public class sender2{
 
     			char a = Character.forDigit(ack, 10);;
     			char b = strRecv.charAt(0);
-    			//System.out.println(a);
-    			//System.out.println(b);
+    			
 
     			if(a==b){
     				
 
     				if(ack ==1){
     					ack = 0;
-    					//System.out.println(ack);
+    					
     				}
     				else if (ack==0) {
     				
     					ack =1;
-    					System.out.println(ack);
+    					
     				}
     				
     				message= null;
@@ -213,15 +191,14 @@ public class sender2{
 
     			char a = Character.forDigit(ack, 10);;
     			char b = strRecv.charAt(0);
-    			//System.out.println(a);
-    			//System.out.println(b);
+    			
 
     			if(a==b){
     				
 
     				if(ack ==1){
     					ack = 0;
-    					//System.out.println(ack);
+    					
     				}
     				else if (ack==0) {
     				
